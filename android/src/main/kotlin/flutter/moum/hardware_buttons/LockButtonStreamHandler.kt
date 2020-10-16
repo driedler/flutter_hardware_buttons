@@ -1,26 +1,24 @@
 package flutter.moum.hardware_buttons
 
-import android.app.Activity
+import android.app.Application
 import io.flutter.plugin.common.EventChannel
 
+class LockButtonStreamHandler(private val application: Application) : EventChannel.StreamHandler {
+    private var mStreamSink: EventChannel.EventSink? = null
 
-class LockButtonStreamHandler(private val activity: Activity): EventChannel.StreamHandler {
-    private val application = activity.application
-    private var streamSink: EventChannel.EventSink? = null
-
-    private val lockButtonListener = object: HardwareButtonsWatcherManager.LockButtonListener {
+    private val lockButtonListener = object : HardwareButtonsWatcherManager.LockButtonListener {
         override fun onLockButtonEvent() {
-            streamSink?.success(0)
+            mStreamSink?.success(0)
         }
     }
 
     override fun onListen(args: Any?, sink: EventChannel.EventSink?) {
-        this.streamSink = sink
-        HardwareButtonsWatcherManager.getInstance(application, activity).addLockButtonListener(lockButtonListener)
+        this.mStreamSink = sink
+        HardwareButtonsWatcherManager.getInstance(application).addLockButtonListener(lockButtonListener)
     }
 
     override fun onCancel(args: Any?) {
-        this.streamSink = null
-        HardwareButtonsWatcherManager.getInstance(application, activity).removeLockButtonListener(lockButtonListener)
+        this.mStreamSink = null
+        HardwareButtonsWatcherManager.getInstance(application).removeLockButtonListener(lockButtonListener)
     }
 }

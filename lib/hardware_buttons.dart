@@ -60,9 +60,9 @@ enum VolumeButtonEvent {
 }
 
 VolumeButtonEvent _eventToVolumeButtonEvent(dynamic event) {
-  if (event == 24) {
+  if (event == 1) {
     return VolumeButtonEvent.VOLUME_UP;
-  } else if (event == 25) {
+  } else if (event == -1) {
     return VolumeButtonEvent.VOLUME_DOWN;
   } else {
     throw Exception('Invalid volume button event');
