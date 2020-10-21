@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hardware_buttons/hardware_buttons.dart' as HardwareButtons;
 
-void main() => runApp(MyApp());
+void main() => runApp(MaterialApp(
+    home: MyApp()));
 
 class MyApp extends StatefulWidget {
   @override
@@ -11,30 +12,68 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('Plugin example app'),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text('Value'),
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context)
+            =>SecondPage()
+            ));
+          },
+          child: Icon(Icons.add),
+          backgroundColor: Colors.green,
+        ),
+    );
+  }
+}
+
+class SecondPage extends StatefulWidget {
+  @override
+  SecondPageState createState() => SecondPageState();
+}
+
+class SecondPageState extends State<SecondPage> with WidgetsBindingObserver{
   String _latestHardwareButtonEvent;
 
-  StreamSubscription<HardwareButtons.VolumeButtonEvent> _volumeButtonSubscription;
+  StreamSubscription<
+      HardwareButtons.VolumeButtonEvent> _volumeButtonSubscription;
   StreamSubscription<HardwareButtons.HomeButtonEvent> _homeButtonSubscription;
   StreamSubscription<HardwareButtons.LockButtonEvent> _lockButtonSubscription;
 
   @override
   void initState() {
     super.initState();
-    _volumeButtonSubscription = HardwareButtons.volumeButtonEvents.listen((event) {
-      setState(() {
-        _latestHardwareButtonEvent = event.toString();
-      });
-    });
+    WidgetsBinding.instance..addObserver(this)..addPostFrameCallback((timeStamp) {
+      _volumeButtonSubscription =
+          HardwareButtons.volumeButtonEvents.listen((event) {
+            setState(() {
+              _latestHardwareButtonEvent = event.toString();
+            });
+          });
 
-    _homeButtonSubscription = HardwareButtons.homeButtonEvents.listen((event) {
-      setState(() {
-        _latestHardwareButtonEvent = 'HOME_BUTTON';
+      _homeButtonSubscription = HardwareButtons.homeButtonEvents.listen((event) {
+        setState(() {
+          _latestHardwareButtonEvent = 'HOME_BUTTON';
+        });
       });
-    });
 
-    _lockButtonSubscription = HardwareButtons.lockButtonEvents.listen((event) {
-      setState(() {
-        _latestHardwareButtonEvent = 'LOCK_BUTTON';
+      _lockButtonSubscription = HardwareButtons.lockButtonEvents.listen((event) {
+        setState(() {
+          _latestHardwareButtonEvent = 'LOCK_BUTTON';
+        });
       });
     });
   }
@@ -62,8 +101,14 @@ class _MyAppState extends State<MyApp> {
             ],
           ),
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Icon(Icons.add),
+          backgroundColor: Colors.green,
+        ),
       ),
     );
   }
-
 }

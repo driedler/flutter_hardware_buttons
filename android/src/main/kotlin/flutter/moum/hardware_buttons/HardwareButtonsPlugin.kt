@@ -1,29 +1,43 @@
 package flutter.moum.hardware_buttons
 
+import androidx.annotation.NonNull
+import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.EventChannel
-import io.flutter.plugin.common.PluginRegistry
 
-class HardwareButtonsPlugin {
-    companion object {
-        private const val VOLUME_BUTTON_CHANNEL_NAME = "flutter.moum.hardware_buttons.volume"
-        private const val HOME_BUTTON_CHANNEL_NAME = "flutter.moum.hardware_buttons.home"
-        private const val LOCK_BUTTON_CHANNEL_NAME = "flutter.moum.hardware_buttons.lock"
+class HardwareButtonsPlugin : FlutterPlugin, ActivityAware {
+    private lateinit var mVolumeEventChannel: EventChannel
+    private lateinit var mHomeEventChannel: EventChannel
+    private lateinit var mLockEventChannel: EventChannel
 
-        @JvmStatic
-        fun registerWith(registrar: PluginRegistry.Registrar) {
-            val activity = registrar.activity()
-            val application = activity.application
+    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        mVolumeEventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "flutter.moum.hardware_buttons.volume")
+        mHomeEventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "flutter.moum.hardware_buttons.home")
+        mLockEventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "flutter.moum.hardware_buttons.lock")
+    }
 
-            registrar.addActivityResultListener(HardwareButtonsWatcherManager.getInstance(application, activity))
+    override fun onDetachedFromActivity() {
+        // No-op
+    }
 
-            val volumeButtonChannel = EventChannel(registrar.messenger(), VOLUME_BUTTON_CHANNEL_NAME)
-            volumeButtonChannel.setStreamHandler(VolumeButtonStreamHandler(activity))
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        // No-op
+    }
 
-            val homeButtonChannel = EventChannel(registrar.messenger(), HOME_BUTTON_CHANNEL_NAME)
-            homeButtonChannel.setStreamHandler(HomeButtonStreamHandler(activity))
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        mVolumeEventChannel.setStreamHandler(VolumeButtonStreamHandler(binding.activity.application))
+        mHomeEventChannel.setStreamHandler(HomeButtonStreamHandler(binding.activity.application))
+        mLockEventChannel.setStreamHandler(LockButtonStreamHandler(binding.activity.application))
+    }
 
-            val lockButtonChannel = EventChannel(registrar.messenger(), LOCK_BUTTON_CHANNEL_NAME)
-            lockButtonChannel.setStreamHandler(LockButtonStreamHandler(activity))
-        }
+    override fun onDetachedFromActivityForConfigChanges() {
+        // No-op
+    }
+
+    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+        mVolumeEventChannel.setStreamHandler(null)
+        mHomeEventChannel.setStreamHandler(null)
+        mLockEventChannel.setStreamHandler(null)
     }
 }

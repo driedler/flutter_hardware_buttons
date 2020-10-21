@@ -40,12 +40,13 @@ public class VolumeButtenStreamHandler: NSObject, FlutterStreamHandler {
     }
     
     // Remove Volume Notification
-    private func removeVolumeObserver() {
+    func removeVolumeObserver() {
         audioSession.removeObserver(self,
                                     forKeyPath: "outputVolume")
         notificationCenter.removeObserver(self,
                                           name: UIApplication.didBecomeActiveNotification,
                                           object: nil)
+        isObserving = false;
     }
     
     @objc func activateAudioSession(){
@@ -71,10 +72,10 @@ public class VolumeButtenStreamHandler: NSObject, FlutterStreamHandler {
                                       context: UnsafeMutableRawPointer?) {
         if keyPath == "outputVolume" {
             if audioSession.outputVolume > volumeLevel {
-                eventSink?(24)
+                eventSink?(1)
             }
             if audioSession.outputVolume < volumeLevel {
-                eventSink?(25)
+                eventSink?(-1)
             }
             volumeLevel = audioSession.outputVolume
         }
