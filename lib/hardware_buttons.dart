@@ -6,12 +6,9 @@ const _VOLUME_BUTTON_CHANNEL_NAME = 'flutter.moum.hardware_buttons.volume';
 const _HOME_BUTTON_CHANNEL_NAME = 'flutter.moum.hardware_buttons.home';
 const _LOCK_BUTTON_CHANNEL_NAME = 'flutter.moum.hardware_buttons.lock';
 
-const EventChannel _volumeButtonEventChannel =
-    EventChannel(_VOLUME_BUTTON_CHANNEL_NAME);
-const EventChannel _homeButtonEventChannel =
-    EventChannel(_HOME_BUTTON_CHANNEL_NAME);
-const EventChannel _lockButtonEventChannel =
-    EventChannel(_LOCK_BUTTON_CHANNEL_NAME);
+const EventChannel _volumeButtonEventChannel = EventChannel(_VOLUME_BUTTON_CHANNEL_NAME);
+const EventChannel _homeButtonEventChannel = EventChannel(_HOME_BUTTON_CHANNEL_NAME);
+const EventChannel _lockButtonEventChannel = EventChannel(_LOCK_BUTTON_CHANNEL_NAME);
 
 Stream<VolumeButtonEvent>? _volumeButtonEvents;
 
@@ -60,9 +57,9 @@ enum VolumeButtonEvent {
 }
 
 VolumeButtonEvent _eventToVolumeButtonEvent(dynamic event) {
-  if (event == 24) {
+  if (event == 24 || event == 1) {
     return VolumeButtonEvent.VOLUME_UP;
-  } else if (event == 25) {
+  } else if (event == 25 || event == -1) {
     return VolumeButtonEvent.VOLUME_DOWN;
   } else {
     throw Exception('Invalid volume button event');
